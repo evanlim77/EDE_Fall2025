@@ -3,6 +3,8 @@ title: "Lab 2 - Data Structures in R"
 subtitle: "Environmental Data Analytics"
 author: "John Fay & Luana Lima"
 date: "Fall 2025"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Objective
@@ -83,16 +85,19 @@ Find a 5-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. C
 ```{r Vector Exercise}
 
 #Assign to the variable 'temps_F' a vector of high temperatures in F
-
+temps_F <- c(80,81,83,83,77) # Creating a vector with the high temps for next 5 days
 
 #What is the average of these temperatures 
-
+mean(temps_F) # calculating the average of the vector values
 
 #Compute the difference between each temperature and the average calculated above
-
+difference_F <- c(temps_F - 80.8) # Creating a new vector where the values are vector 1 minus the average value
+temps_F - mean(temps_F)
 
 #Subtract 32 and multiply by 5/9ths to create a vector in Celsius
+temps_C <- ((temps_F - 32)) * (5/9) # Creating a new vector with temps in celsius
 
+(temps_F-32) * 5/9
 
 ```
 
@@ -163,6 +168,7 @@ matrix4['R2','C1']
 ### Exercise 1b: Matrices
 Compute the mean of column "C2" in matrix4. (Should be 14.5)
 ```{r Matrix Exercise}
+mean(matrix4[ , 'C2'])
 
 ```
 
@@ -198,7 +204,7 @@ names(list1)
 #
 list1[1:2]
 
-#
+# can update values in a list
 list1$name = "Janelle"
 
 #
