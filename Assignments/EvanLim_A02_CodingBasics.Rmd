@@ -61,16 +61,26 @@ median(fivefive_sequence) #Calculating the median of the sequence
 8.  Label the columns of your data frame with informative titles.
 
 ```{r basics 2}
-#5.
+#5,6.
 
 student_name <- c("John", "Luana", "Mishka", "Kelly") # Vector type: character
-test_score <- c(75, 80, 87, 100) # Vector type: numerical
+test_score <- c(75, 80, 87, 100) # Vector type: numeric
+on_scholarship <- c(TRUE, TRUE, FALSE, FALSE) # Vector type: logical
+
+
+#7.
+
+student_info <- data.frame(student_name,test_score,on_scholarship) # Creating a data frame from the vectors
+
+#8.
+
+names(student_info) <- c("Name","Test result", "Scholarship Status") # Labeling the columns of the data frame
 
 ```
 
 9.  QUESTION: How is this data frame different from a matrix?
 
-> Answer:
+> Answer: While both data frames and matrices are composed of several vectors, data frames can host multiple kinds of variables. This data frame has numerical, character, and logical values, while a matrix could have only numerical or only character or only logical values.
 
 10. Create a function with one input. In this function, use `if`...`else` to evaluate the value of the input: if it is greater than 50, print the word "Pass"; otherwise print the word "Fail". 
 
