@@ -40,23 +40,14 @@ fivefive_sequence <- seq(1, 55, 5) # Creating a sequence from one to 55
 
 mean(fivefive_sequence) #Calculating the mean of the sequence
 
-"The mean of the sequence is 26"
-
 median(fivefive_sequence) #Calculating the median of the sequence
-
-"The median is 26"
 
 #3. 
 
 meanfivefive <- mean(fivefive_sequence) #Assigning a name to the mean
 medianfivefive <- median(fivefive_sequence) #Assigning a name to the median
 
-meanfivefive > medianfivefive # Checking if the mean is greater than the median,
-#output is FALSE
-medianfivefive > meanfivefive # Checking if the median is greater than the mean,
-#output is FALSE
-meanfivefive == medianfivefive # Checking if the mean is equal to the median, 
-#output is TRUE
+meanfivefive > medianfivefive # Asking if the mean is greater than the median
 
 ```
 
@@ -123,19 +114,18 @@ function_two <- function(x){
 
 #12a. Run the first function with the value 52.5
 
-function_one(52.5) # Running function one, which prints "Pass"
+function_one(52.5) # Running function one
 
 #12b. Run the second function with the value 52.5
 
-function_two(52.5) # Running function two, which prints "Pass"
+function_two(52.5) # Running function two
 
 #13a. Run the first function with the vector of test scores
 # function_one(test_score) Running this function but commenting it out to enable
 #knitting
 
 #13b. Run the second function with the vector of test scores
-function_two(test_score) # This works, printing "Pass" for all values (which are
-#indeed greater than 50)
+function_two(test_score) # This works, printing "Pass" for all values
 ```
 
 14. QUESTION: Which option of `if`...`else` vs. `ifelse` worked? Why? (Hint: search the web for "R vectorization")
