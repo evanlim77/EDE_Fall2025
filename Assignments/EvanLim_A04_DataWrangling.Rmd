@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling (Fall 2025)"
-author: "Student Name"
+author: "Evan Lim"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -30,11 +30,20 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Wr
 2. Add the appropriate code to reveal the dimensions of the four datasets. 
 
 ```{r setup, message = FALSE}
-#1a 
+#1a Setting up packages
+library(tidyverse)
+library(lubridate)
+library(here)
 
-#1b 
+#1b Checking working directory
+getwd()
+here()
 
-#1c 
+#1c Reading in all four EPA Air data files
+EPA.03.2018 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPA.03.2019 <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors = TRUE)
+EPA.PM25.2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPA.PM25.2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
 
 #2 
 
