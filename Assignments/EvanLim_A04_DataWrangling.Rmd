@@ -3,6 +3,8 @@ title: "Assignment 4: Data Wrangling (Fall 2025)"
 author: "Evan Lim"
 output: pdf_document
 geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -40,13 +42,17 @@ getwd()
 here()
 
 #1c Reading in all four EPA Air data files
-EPA.03.2018 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
-EPA.03.2019 <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors = TRUE)
-EPA.PM25.2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
-EPA.PM25.2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
+EPA.O3.2018 <- read.csv(here("./Data/Raw/EPAair_O3_NC2018_raw.csv"), stringsAsFactors = TRUE)
+EPA.O3.2019 <- read.csv(here("./Data/Raw/EPAair_O3_NC2019_raw.csv"), stringsAsFactors = TRUE)
+EPA.PM25.2018 <- read.csv(here("./Data/Raw/EPAair_PM25_NC2018_raw.csv"), stringsAsFactors = TRUE)
+EPA.PM25.2019 <- read.csv(here("./Data/Raw/EPAair_PM25_NC2019_raw.csv"), stringsAsFactors = TRUE)
 
-#2 
 
+#2 Revealing dimensions of each dataset
+dim(EPA.O3.2018)
+dim(EPA.O3.2019)
+dim(EPA.PM25.2018)
+dim(EPA.PM25.2019)
 
 ```
 
@@ -64,14 +70,22 @@ EPA.PM25.2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFact
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r questions 3 thru 4}
-#3
+#3 Changing the Date columns to be date objects
 
+EPA.O3.2018$Date <- as.Date(EPA.O3.2018$Date, format = "%m/%d/%Y")
+EPA.O3.2019$Date <- as.Date(EPA.O3.2019$Date, format = "%m/%d/%Y")
+EPA.PM25.2018$Date <- as.Date(EPA.PM25.2018$Date, format = "%m/%d/%Y")
+EPA.PM25.2019$Date <- as.Date(EPA.PM25.2019$Date, format = "%m/%d/%Y")
 
-#4
+#4 Selecting specific columns for each data set
 
+EPA.O3.2018.select <- select(EPA.O3.2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPA.O3.2019.select <- select(EPA.O3.2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPA.PM25.2018.select <- select(EPA.PM25.2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPA.PM25.2019.select <- select(EPA.PM25.2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
-
+EPA.PM25.2018.select$AQS_PARAMETER_DESC <- mutate(EPA.PM25.2018.select$AQS_PARAMETER_DESC == "PM2.5")
 
 #6
 
