@@ -84,11 +84,24 @@ EPA.O3.2019.select <- select(EPA.O3.2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_
 EPA.PM25.2018.select <- select(EPA.PM25.2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 EPA.PM25.2019.select <- select(EPA.PM25.2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
-#5
-EPA.PM25.2018.select$AQS_PARAMETER_DESC <- mutate(EPA.PM25.2018.select$AQS_PARAMETER_DESC == "PM2.5")
+#5 Changing column cells to PM2.5
+
+EPA.PM25.2018.select$AQS_PARAMETER_DESC <- "PM2.5"
+EPA.PM25.2019.select$AQS_PARAMETER_DESC <- "PM2.5"
 
 #6
 
+write.csv(EPA.O3.2018.select, row.names = FALSE,
+          file = "./Data/Processed/EPAair_O3_NC2018_processed")
+
+write.csv(EPA.O3.2019.select, row.names = FALSE,
+          file = "./Data/Processed/EPAair_O3_NC2019_processed")
+
+write.csv(EPA.PM25.2018.select, row.names = FALSE,
+          file = "./Data/Processed/EPAair_PM25_NC2018_processed")
+
+write.csv(EPA.PM25.2019.select, row.names = FALSE,
+          file = "./Data/Processed/EPAair_PM25_NC2019_processed")
 ```
 
 
@@ -120,14 +133,23 @@ EPA.PM25.2018.select$AQS_PARAMETER_DESC <- mutate(EPA.PM25.2018.select$AQS_PARAM
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1819_Processed.csv"
 
 ```{r questions 7 thru 11}
-#7 
+#7 Combining four datasets
 
+EPA.O3.PM25.NC1819 <- rbind(EPA.O3.2018.select, EPA.O3.2019.select, EPA.PM25.2018.select, EPA.PM25.2019.select)
 
-#8 
-
+#8 Filtering by common sites, forming groups, taking means, adding Month and Year columns
+EPA.O3.PM25.NC1819.piped <- EPA.O3.PM25.NC1819 %>% 
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue",  
+  "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", 
+  "West Johnston Co.", "Garinger High School", "Castle Hayne", 
+  "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>% 
+  summarize(Mean_AQI = mean(DAILY_AQI_VALUE), Mean_Lat = mean(SITE_LATITUDE), Mean_Lon = mean(SITE_LONGITUDE)) %>% 
+  mutate(Month = month(Date), Year = year(Date))
+  
 
 #9
-
+EPA.O3.PM25.NC1819.piped.spread <- spread(EPA.O3.PM25.NC1819.piped, Site.Name, AQS_PARAMETER_DESC)
 
 #10
 
