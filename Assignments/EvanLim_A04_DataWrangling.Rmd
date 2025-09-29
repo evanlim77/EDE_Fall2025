@@ -1,9 +1,11 @@
 ---
-title: "Assignment 4: Data Wrangling (Fall 2025)"
+title: 'Assignment 4: Data Wrangling (Fall 2025)'
 author: "Evan Lim"
-output: pdf_document
+output:
+  pdf_document: default
+  word_document: default
 geometry: margin=2.54cm
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -94,8 +96,8 @@ EPA.PM25.2019.select <- select(EPA.PM25.2019, Date, DAILY_AQI_VALUE, Site.Name,
 
 #5 Changing column cells to PM2.5
 
-EPA.PM25.2018.select$AQS_PARAMETER_DESC <- "PM2.5"
-EPA.PM25.2019.select$AQS_PARAMETER_DESC <- "PM2.5"
+EPA.PM25.2018.select$AQS_PARAMETER_DESC <- c("PM2.5")
+EPA.PM25.2019.select$AQS_PARAMETER_DESC <- c("PM2.5")
 
 #6 Saving processed datasets
 
@@ -165,7 +167,7 @@ EPA.O3.PM25.NC1819.piped <- EPA.O3.PM25.NC1819 %>%
          Year = year(Date))
   
 
-#9 Soreading AQI values for ozone and Pm2.5 into separate columns
+#9 Spreading AQI values for ozone and Pm2.5 into separate columns
 EPA.O3.PM25.NC1819.tidy <- pivot_wider(EPA.O3.PM25.NC1819.piped, 
                                        names_from = AQS_PARAMETER_DESC, 
                                        values_from = Mean_AQI)
