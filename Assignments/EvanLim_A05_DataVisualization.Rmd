@@ -31,9 +31,24 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
 2. Make sure R is reading dates as date format; if not change the format to date.
 
 ```{r initialize project}
-#1 
+#1 Workspace set up, loading packages, checking WD and importing files
+library(tidyverse)
+library(here)
+library(cowplot)
 
-#2 
+# Checking WD
+getwd()
+here()
+
+# Importing datasets
+
+Peter.Paul <- read.csv(here("./Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
+
+Neonics <- read.csv(here("./Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed.csv"), stringsAsFactors = TRUE)
+
+#2 Changing formats to date
+Peter.Paul$sampledate <- ymd(Peter.Paul$sampledate)
+Neonics$collectDate <- ymd(Neonics$collectDate)
 
 ```
 ## Define your theme
@@ -45,7 +60,17 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
  * Legend
 
 ```{r build plot theme}
-#3
+#3 Making a custom theme
+
+eggyolk_theme <- theme_base() +
+  theme(
+    axis.title = element_text(color = "orange"),
+    legend.position = "right",
+    plot.title.position = "plot",
+    plot.background = element_rect(color = "gray")
+  )
+
+theme_set(eggyolk_theme)
 
 ```
 
@@ -55,7 +80,23 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 4. [NTL-LTER] Plot total phosphorus (`tp_ug`) by phosphate (`po4`), with separate aesthetics for Peter and Paul lakes. Add line(s) of best fit using the `lm` method. Adjust your axes to hide extreme values (hint: change the limits using `xlim()` and/or `ylim()`).
 
 ```{r plot total P vs PO4}
-#4 
+#4 Plotting total phosphorus by phosphate for Peter and Paul Lakes
+
+Peter.Paul %>%  
+  ggplot(
+    aes(
+      x = tp_ug,
+      y = po4,
+      color = lakename)
+    ) +
+  geom_point() +
+  geom_smooth(
+    method = "lm",
+    se = FALSE
+) +
+  xlim(0,100)+
+  ylim(0,45)
+
 
 ```
 
@@ -70,6 +111,52 @@ Tips:
 
 ```{r Create boxplots}
 #5 
+Peter.Paul$month <- factor(
+  Peter.Paul$month,
+  levels = c("5","6","7","8","9","10","11"),
+  labels = c("May","Jun","Jul","Aug","Sep","Oct","Nov")
+)
+ 
+unique(Peter.Paul$month)
+
+tempplot <- ggplot(Peter.Paul,
+    aes(
+      x = month,
+      y = temperature_C,
+      color = lakename)) +
+    geom_boxplot()+
+  theme(
+    axis.title.x = element_blank(),
+    legend.position = "none",
+    ylab("Temp")
+    )
+
+  
+TPplot <- ggplot(Peter.Paul,
+    aes(
+      x = month,
+      y = tp_ug,
+      color = lakename)) +
+    geom_boxplot()+
+   theme(
+    axis.title.x = element_blank(),
+    ylab("TP")
+    )
+  
+
+TNplot <- ggplot(Peter.Paul,
+    aes(
+      x= month,
+      y = tn_ug,
+      color = lakename)) +
+    geom_boxplot()+
+   theme(
+     legend.position = "none",
+     ylab("TN")
+         )
+  
+
+plot_grid(tempplot, TPplot, TNplot, nrow = 3, align = "v")
 
 ```
 
