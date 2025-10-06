@@ -43,7 +43,8 @@ here()
 # Importing datasets
 
 Peter.Paul <- read.csv(here(
-  "./Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
+  "./Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), 
+  stringsAsFactors = TRUE)
 
 Niwo <- read.csv(here(
   "./Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed.csv"), 
@@ -70,10 +71,13 @@ eggyolk_theme <- theme_classic() +
     axis.title = element_text(color = "orange"),
     legend.position = "right",
     plot.title.position = "plot",
-    plot.background = element_rect(color = "gray")
+    panel.background = element_rect(fill = "yellow")
   )
 
+# Setting my theme to the default
+
 theme_set(eggyolk_theme)
+
 
 ```
 
@@ -113,11 +117,7 @@ Tips:
 * Individual plots can have different sizes when combined using `cowplot`.
 
 ```{r Create boxplots}
-#5 
-#commenting out to allow for knitting
-#factor(Peter.Paul$month,
-#       levels = 1:12,
-#      labels = month.abb)
+#5 Creating three boxplots and printing them together
 
 tempplot <- ggplot(Peter.Paul,
     aes(
@@ -135,8 +135,8 @@ tempplot <- ggplot(Peter.Paul,
   theme(
     axis.title.x = element_blank(),
     legend.position = "none",
-    )
-
+    ) +
+  ylab("Temp")
   
 TPplot <- ggplot(Peter.Paul,
     aes(
@@ -153,9 +153,8 @@ TPplot <- ggplot(Peter.Paul,
   ) +
    theme(
     axis.title.x = element_blank(),
-    ylab("TP")
-  )
-  
+  ) +
+  ylab("TP")
 
 TNplot <- ggplot(Peter.Paul,
     aes(
@@ -172,8 +171,8 @@ TNplot <- ggplot(Peter.Paul,
   ) +
    theme(
      legend.position = "none",
-     ylab("TN")
-   )
+   ) +
+  ylab("TN")
   
 
 plot_grid(tempplot, TPplot, TNplot, nrow = 3, align = "v")
@@ -194,7 +193,7 @@ The same is true for nitrogen, though perhaps to a lesser extent.
 7. [Niwot Ridge] Now, plot the same plot but with NLCD classes separated into three facets rather than separated by color. 
 
 ```{r Plot litter}
-#6
+#6 Plotting dry mass by date and using NLCD class as color
 Niwo.litter <- Niwo %>% 
   filter(
     functionalGroup == "Needles") %>%
@@ -209,7 +208,7 @@ Niwo.litter <- Niwo %>%
   
 print(Niwo.litter)
 
-#7
+#7 Separated by facets
 Niwo.litter.faceted <- Niwo %>% 
   filter(
     functionalGroup == "Needles") %>%
