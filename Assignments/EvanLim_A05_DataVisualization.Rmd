@@ -42,9 +42,12 @@ here()
 
 # Importing datasets
 
-Peter.Paul <- read.csv(here("./Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
+Peter.Paul <- read.csv(here(
+  "./Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
 
-Niwo <- read.csv(here("./Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed.csv"), stringsAsFactors = TRUE)
+Niwo <- read.csv(here(
+  "./Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed.csv"), 
+  stringsAsFactors = TRUE)
 
 #2 Changing formats to date
 Peter.Paul$sampledate <- ymd(Peter.Paul$sampledate)
@@ -111,20 +114,24 @@ Tips:
 
 ```{r Create boxplots}
 #5 
-Peter.Paul$month <- factor(
-  Peter.Paul$month,
-  levels = c("5","6","7","8","9","10","11"),
-  labels = c("May","Jun","Jul","Aug","Sep","Oct","Nov")
-)
- 
-unique(Peter.Paul$month)
+#commenting out to allow for knitting
+#factor(Peter.Paul$month,
+#       levels = 1:12,
+#      labels = month.abb)
 
 tempplot <- ggplot(Peter.Paul,
     aes(
-      x = month,
+      x = factor(
+        month, 
+        levels = 1:12, 
+        labels = month.abb),
       y = temperature_C,
       color = lakename)) +
     geom_boxplot()+
+  scale_x_discrete(
+    name = 'Month',
+    drop = FALSE
+  ) +
   theme(
     axis.title.x = element_blank(),
     legend.position = "none",
@@ -133,26 +140,40 @@ tempplot <- ggplot(Peter.Paul,
   
 TPplot <- ggplot(Peter.Paul,
     aes(
-      x = month,
+      x = factor(
+        month, 
+        levels = 1:12, 
+        labels = month.abb),
       y = tp_ug,
       color = lakename)) +
     geom_boxplot()+
+  scale_x_discrete(
+    name = 'Month',
+    drop = FALSE
+  ) +
    theme(
     axis.title.x = element_blank(),
     ylab("TP")
-    )
+  )
   
 
 TNplot <- ggplot(Peter.Paul,
     aes(
-      x= month,
+      x= factor(
+        month, 
+        levels = 1:12, 
+        labels = month.abb),
       y = tn_ug,
       color = lakename)) +
-    geom_boxplot()+
+    geom_boxplot() +
+  scale_x_discrete(
+    name = 'Month',
+    drop = FALSE
+  ) +
    theme(
      legend.position = "none",
      ylab("TN")
-         )
+   )
   
 
 plot_grid(tempplot, TPplot, TNplot, nrow = 3, align = "v")
