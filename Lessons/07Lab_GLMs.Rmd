@@ -48,7 +48,34 @@ Create three plots, each with appropriately formatted axes and legends. Choose a
 
 ```{r}
 #Exercise 1:
+ozone.year <- EPAair %>% 
+  ggplot(
+    aes(
+      x = Ozone,
+      fill = as.factor(Year)))+ 
+    geom_density(alpha=0.5)+
+      scale_fill_manual(values = c("darkgreen", "darkblue"))+
+      labs(x="Ozone AQI value",
+           y = "Density",
+           fill ="")
 
+print(ozone.year)
+
+
+O3.boxplot <-
+  ggplot(EPAair, aes(x = as.factor(Year),
+                     y = Ozone)) +
+  geom_boxplot()+
+  stat_summary(geom = "text",
+               fun = max,
+               vjust = -1,
+               size = 4,
+               label = (c("b", "a"))) +
+  labs(x="",
+       y="Ozone AQI value")+
+  ylim(0,150)
+
+print(O3.boxplot)
 
 ```
 
@@ -61,11 +88,26 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 ```{r}
 
 #Exercise 2: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
+pm25.ozone.regression <-
+  lm(data = EPAair, PM2.5 ~ Ozone)
+summary(pm25.ozone.regression)
 
+#r2 is 13%, so there are more things driving the variability of the response
 
 
 #Exercise 3: Build a scatterplot. Add a line and standard error for the linear regression. Add the regression equation to the plot
 
+pm25byozone <-
+  ggplot(EPAair, aes(x = Ozone, y = PM2.5))+
+  geom_point() +
+    geom_smooth(method = "lm")+
+  geom_text(
+    x=100,
+    y=75,
+    label=expression("PM2.5=0.38*Ozone+15.64")
+  )
+
+print(pm25byozone)
 
 
 ```
@@ -79,15 +121,33 @@ What other variables can we add to improve model?
 
 #Exercise 4: Build correlation plots and identify more possible explanatory variables to add to the regression.
 
+library(corrplot)
 
+EPAairmeasures <-
+  EPAair %>% 
+  select(mean_Lat:Ozone) %>% 
+  na.omit()
+
+EPAairCorr <- cor(EPAairmeasures)
+corrplot(EPAairCorr, method = "ellipse")
+corrplot.mixed(EPAairCorr, upper = "ellipse")
+
+# Mean_Lat and month next best variables to add...
 
 
 #Exercise 5: Choose a model by AIC in a Stepwise Algorithm. Do the results from AIC match the variables you selected on Exercise 4?
 
+airAIC <- lm(data = EPAairmeasures, PM2.5~Ozone + Year + Month + mean_Lng + mean_Lat)
 
+step(airAIC)
 
+#looking for variables that you remove and result in lower AIC
 
 #Exercise 6: Run another regression using the variables selected on Exercise 6. Compare r-squared value with the one from Exercise 2. 
+
+#add in all the relevant variables to create the best possible regression
+
+best.regression <- lm()
 
 ```
 
