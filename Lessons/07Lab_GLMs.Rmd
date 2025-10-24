@@ -70,12 +70,28 @@ O3.boxplot <-
                fun = max,
                vjust = -1,
                size = 4,
-               label = (c("b", "a"))) +
-  labs(x="",
-       y="Ozone AQI value")+
+               label = c("b", "a")) +
+  labs(x= "",
+       y="Ozone AQI value") +
   ylim(0,150)
 
 print(O3.boxplot)
+
+O3.violin <-
+  ggplot(EPAair, aes(x = as.factor(Year),
+                     y = Ozone)) +
+  geom_violin(draw_quantiles = 0.5) +
+  stat_summary(geom = "text",
+                fun = max,
+                vjust = -1,
+                size = 4,
+                label = c("b","a")) +
+  labs(x="",
+       y="Ozone AQI value") +
+  ylim(0,150)
+
+print(O3.violin)
+
 
 ```
 
@@ -147,7 +163,9 @@ step(airAIC)
 
 #add in all the relevant variables to create the best possible regression
 
-best.regression <- lm()
+best.regression <- lm(data = EPAairmeasures, PM2.5~Ozone + mean_Lng + Month + mean_Lat)
+
+summary(best.regression)
 
 ```
 
