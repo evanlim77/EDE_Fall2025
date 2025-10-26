@@ -226,23 +226,35 @@ TukeyHSD(Lake.wrangled.anova)
 
 16.From the findings above, which lakes have the same mean temperature, statistically speaking, as Peter Lake? Does any lake have a mean temperature that is statistically distinct from all the other lakes?
 
->Answer: Central Long Lake (-3.85), Crampton Lake (-2.03), East Long Lake (3.04), Hummingbird Lake (2.54), Tuesday Lake (-2.24), West Long Lake (-1.73)
-
- 
+>Answer: Paul Lake and Ward Lake appear to have the same mean temperature as 
+Peter Lake, statistically speaking. Though they do have some differences, their 
+p values are 0.22 and 0.78 respectively, meaning the differences are not 
+statistically significant. It appears that there is no lake whose mean temp
+is statistically distinct from all the other lakes.
 
 17. If we were just looking at Peter Lake and Paul Lake. What's another test we might explore to see whether they have distinct mean temperatures? 
 
->Answer: 
+>Answer: Since we're comparing the means of two samples, we would use a two
+sample t-test to check if the lakes have distinct mean temperatures.
 
 
 
 18. Wrangle the July data to include only records for Crampton Lake and Ward Lake. Run the two-sample T-test on these data to determine whether their July temperature are same or different. What does the test say? Are the mean temperatures for the lakes equal? Does that match you answer for part 16?
 
 ```{r t.test}
+# Wrangling the data
 Crampton.Ward <- Lake.wrangled %>% 
   filter(lakename %in% c("Crampton Lake", "Ward Lake"))
 
+# Running two-sample t-test
+Crampton.Ward.twosample <- t.test(Crampton.Ward$temperature_C ~ Crampton.Ward$lakename)
+
+Crampton.Ward.twosample
 
 ```
 
->Answer: 
+>Answer: The test results in a p-value of 0.26, which is above .05. Therefore,
+we accept the null hypothesis, which states that the means of the two samples
+are the same. This does match the answer / results of the ANOVA/Tukey HSD,
+which also demonstrated that Crampton and Ward do not have a statistically
+significant different in mean temp.
