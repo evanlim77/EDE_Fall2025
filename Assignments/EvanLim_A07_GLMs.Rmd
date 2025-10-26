@@ -41,7 +41,9 @@ getwd()
 here()
 
 #Importing data and correcting dates
-Lake <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+Lake <- read.csv(here("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"),
+                 stringsAsFactors = TRUE)
+          
 
 Lake$sampledate <- mdy(Lake$sampledate)
 
@@ -177,12 +179,21 @@ which was responsible for 73.87% of the variance.
 ```{r anova.model}
 #12
 
+summary(Lake.wrangled)
+summary(Lake.wrangled$lakename)
+
+#Running anova
+Lake.wrangled.anova <- aov(data = Lake.wrangled, temperature_C ~ lakename)
+summary(Lake.wrangled.anova)
 
 ```
 
 13. Is there a significant difference in mean temperature among the lakes? Report your findings. 
 
-> Answer: 
+> Answer: The ANOVA test has resulted in a p value less than .05, meaning we
+reject the null hypothesis of the mean temperature among all lakes being the same.
+In other words, there is a statistically significant difference in mean temps
+among the lakes.
 
 
 
@@ -190,21 +201,32 @@ which was responsible for 73.87% of the variance.
 
 ```{r scatterplot.2}
 #14.
+tempvsdepth.bylake <- ggplot(Lake.wrangled, 
+                      aes(x=depth, 
+                          y=temperature_C,
+                          color=lakename)) +
+                  geom_point(alpha = 0.5) +
+                  geom_smooth(method = lm) +
+                  ylim(0,35) +
+                  ylab("Temperature (C)") +
+                  xlab("Lake Depth") +
+                  labs(color = "Lake Name")+
+                  theme(legend.position = "right")
 
-
+print(tempvsdepth.bylake)
 ```
 
 15. Use the Tukey's HSD test to determine which lakes have different means.
 
 ```{r tukey.test}
 #15
-
+TukeyHSD(Lake.wrangled.anova)
 
 ```
 
 16.From the findings above, which lakes have the same mean temperature, statistically speaking, as Peter Lake? Does any lake have a mean temperature that is statistically distinct from all the other lakes?
 
->Answer:
+>Answer: Central Long Lake (-3.85), Crampton Lake (-2.03), East Long Lake (3.04), Hummingbird Lake (2.54), Tuesday Lake (-2.24), West Long Lake (-1.73)
 
  
 
@@ -217,6 +239,9 @@ which was responsible for 73.87% of the variance.
 18. Wrangle the July data to include only records for Crampton Lake and Ward Lake. Run the two-sample T-test on these data to determine whether their July temperature are same or different. What does the test say? Are the mean temperatures for the lakes equal? Does that match you answer for part 16?
 
 ```{r t.test}
+Crampton.Ward <- Lake.wrangled %>% 
+  filter(lakename %in% c("Crampton Lake", "Ward Lake"))
+
 
 ```
 
