@@ -111,12 +111,12 @@ GaringerOzone <- left_join(Days, GaringerOzone.wrangled)
 7. Create a line plot depicting ozone concentrations over time. In this case, we will plot actual concentrations in ppm, not AQI values. Format your axes accordingly. Add a smoothed line showing any linear trend of your data. Does your plot suggest a trend in ozone concentration over time?
 
 ```{r}
-#7
+#7 Creating a lnie plot depicting ozone concentrations over time
 ggplot(GaringerOzone,
        aes(x = Date,
            y = Daily.Max.8.hour.Ozone.Concentration)) +
   geom_line() +
-  geom_smooth(method = lm, SE = FALSE) +
+  geom_smooth(method = lm, se = FALSE) +
   ylab("Ozone Concentration (ppm)")
 ```
 
@@ -138,10 +138,10 @@ GaringerOzone.clean <- GaringerOzone %>%
 
 ```
 
-> Answer: Linear interpolation provides a smoother, more accurate result
-than piecewise constant. And since we require mostly straight lines to connect
-data points that are fairly continuous, we can just use linear instead of spline
-interpolation, which tends to be a bit more complex. 
+> Answer: Linear interpolation is the most simple of the methods and allows
+us to keep the seasonality of our data. Given that we have seasonal data and 
+given that we don't want to use overly complex methods, linear interpolation is
+the method that makes the most sense here.
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
@@ -152,7 +152,7 @@ interpolation, which tends to be a bit more complex.
 GaringerOzone.monthly <- GaringerOzone.clean %>% 
   mutate(Month = month(Date),
          Year = year(Date)) %>% 
-  group_by(Month, Year) %>% 
+  group_by(Year, Month) %>% 
   summarize(Mean_Ozone = mean(Ozone.Clean))
 
 GaringerOzone.monthly$Date <- my(paste0(GaringerOzone.monthly$Month,"-",GaringerOzone.monthly$Year))
@@ -163,7 +163,7 @@ GaringerOzone.monthly$Date <- my(paste0(GaringerOzone.monthly$Month,"-",Garinger
 10. Generate two time series objects. Name the first `GaringerOzone.daily.ts` and base it on the dataframe of daily observations. Name the second `GaringerOzone.monthly.ts` and base it on the monthly average ozone values. Be sure that each specifies the correct start and end dates and the frequency of the time series.
 
 ```{r}
-#10
+#10 Generating time series objects, one for daily and one for monthly
 
 f_day <- day(first(GaringerOzone.clean$Date))
 f_month <- month(first(GaringerOzone.clean$Date))
@@ -183,7 +183,7 @@ GaringerOzone.monthly.ts <- ts(GaringerOzone.monthly$Mean_Ozone,
 11. Decompose the daily and the monthly time series objects and plot the components using the `plot()` function.
 
 ```{r}
-#11
+#11 Creating and plotting decompositions
 
 GaringerOzone.daily.decomp <- stl(GaringerOzone.daily.ts, s.window = "periodic")
 GaringerOzone.monthly.decomp <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
@@ -197,7 +197,7 @@ plot(GaringerOzone.monthly.decomp)
 12. Run a monotonic trend analysis for the monthly Ozone series. In this case the seasonal Mann-Kendall is most appropriate; why is this?
 
 ```{r}
-#12
+#12 Running SMK test on monthly Ozone series
 GaringerOzone.monthly.trend <- smk.test(GaringerOzone.monthly.ts)
 
 GaringerOzone.monthly.trend
@@ -213,7 +213,7 @@ it causes in the data.
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
-# 13
+# 13 Creating a plot depicting mean monthly ozone concentrations over time
 
 ggplot(GaringerOzone.monthly,
        aes(x = Date,
@@ -227,10 +227,13 @@ ggplot(GaringerOzone.monthly,
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: The graph indicates that there is not a great change in ozone concentrations
-over the 2010s. Each seasonal peak appears to remain consistently at .055 and the
-lows appear to remain consistently at .025. From our tests, we can assume there
-is not a statistically significant trend (p-value = 0.17).
+> Answer: We conclude that ozone concentrations have changed over the 2010s at
+this station. The graph does indicate a slight decrease over the years as 
+the peak values appear to drop slightly, and we can assume from the results of
+our Seasonal Mann-Kendall test that this trend is indeed statistically 
+significant. Notably, our p-value is right at the border of statistical
+significance, so we might want to be mindful and perhaps conduct another
+analysis to confirm our results (p-value = 0.049). 
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -239,11 +242,6 @@ is not a statistically significant trend (p-value = 0.17).
 ```{r}
 #15 Creating updated data frame without seasonal component
 GaringerOzone.monthly_components <- as.data.frame(GaringerOzone.monthly.decomp$time.series)
-
-#GaringerOzone.monthly_components <- GaringerOzone.monthly_components %>% 
-#  mutate(Observed = GaringerOzone.monthly$Mean_Ozone,
-#         Date = GaringerOzone.monthly$Date) %>% 
-#  select(trend, remainder, Observed, Date)
 
 GaringerOzone.monthly_components <- GaringerOzone.monthly_components %>% 
   mutate(Observed = GaringerOzone.monthly$Mean_Ozone,
@@ -255,8 +253,6 @@ GaringerOzone.monthly.noseasonal.ts <- ts(GaringerOzone.monthly_components$Minus
                              start = c(f_year,f_month),
                              frequency = 12) 
 
-
-
 #16 Running MK test on non-seasonal monthly Ozone series
 
 GaringerOzone.monthly.noseasonal.trend <- mk.test(GaringerOzone.monthly.noseasonal.ts)
@@ -267,8 +263,9 @@ summary(GaringerOzone.monthly.noseasonal.trend)
 ```
 
 > Answer: After removing the seasonal component and running the Mann-Kendall test,
-we obtained a p-value of 0.10, in contrast to the seasonal Mann-Kendall test
-result of 0.17. While this p-value is lower and closer to being statistically
-significant, it is still above .05 and thus indicates that any trend in the data
-is statistically insigificant. Therefore, just as with our other model, we can
-conclude ozone concentrations at this station have not changed over the 2010s.
+we obtained a p-value of 0.007, in contrast to the seasonal Mann-Kendall test
+result of 0.049. This p-value is well below .05 and indicates greater statistical 
+significance. This is likely due to the fact that seasonality in data can blur
+the trend itself, so in removing seasonality and examining just the trend with the Mann-Kendall test, we obtained a cleaner result. Thus, we can be more confident
+in stating there is a statistically significant downward trend in ozone
+concentrations over time at this site during the 2010s.
