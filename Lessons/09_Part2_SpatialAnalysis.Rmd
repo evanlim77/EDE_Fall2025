@@ -141,8 +141,11 @@ huc8_sf_2 <- st_read(here('Data/Spatial/NCHUC8.shp')) %>%
   filter(SUBBASIN == "Upper Neuse")
 
 #Create a map
-ggplot(data = huc8_sf_2) +
-  geom_sf(fill = 'yellow', border.colour = 'blue')
+ggplot() +
+  geom_sf(data = huc8_sf, color = 'gray') +
+  geom_sf(data = huc8_sf_2, color = 'blue', fill = 'yellow')
+ 
+
 
 ```
 
@@ -220,13 +223,24 @@ ggplot() +
 
 ```{r}
 #Import data, setting HUC_12 to be factors, and computing a HUC_8 column
+wind_energy_raw <- read.csv('https://raw.githubusercontent.com/ENV859/EnviroAtlasData/main/Wind_Energy.csv', colClasses = c('HUC_12' = 'factor')) 
 
-  
+wind_energy_wrangled <- wind_energy_raw %>% 
+  mutate(HUC_8 = substr(wind_energy_raw$HUC_12, 1, 8)) %>% 
+  group_by(HUC_8) %>% 
+  summarize(Sum_Wind_Energy = sum(AvgWindEnergy))
+ 
 #Join to HUC_8 features
 
+wind_energy_join <- left_join(huc8_sf, wind_energy_wrangled)
 
 #View the outputs
-
+ggplot(data=wind_energy_join) +
+  geom_sf(aes(fill = Sum_Wind_Energy)) +
+  labs(
+    title = "Wind Energy by HUC 8",
+    fill = "MW/year"
+  )
 
 ```
 
@@ -250,14 +264,16 @@ mapview(state_sf)
 
 ```{r Aggregate the HUC data on an attribute, saving as huc2_sf}
 #List the unique values in the DWQ_Basin field
-
+unique(huc8_sf$DWQ_Basin)
 
 #Summarize on DWQ Basin value
-huc2_sf <- 
+huc2_sf <- huc8_sf %>% 
+  group_by(DWQ_Basin) %>% 
+  summarize(ACRES = sum(ACRES))
   
 
 #Map the data
-
+mapview(huc2_sf,zcol='ACRES')
 
 ```
 
@@ -338,14 +354,24 @@ mapview(neuse_counties_sf, zcol='Area_m2')
 triCo <- counties_sf_utm %>% 
   filter(NAME %in% c("Durham","Wake", "Orange", "Chatham")) 
 
+myMap2 = mapview(triCo, 
+                col.regions = 'yellow', 
+                alpha.regions = 0.2,
+                map.types = "CartoDB.Positron",
+                legend = FALSE)
+#Show the map
+myMap2
   
 #Grab the intersecting HUC_8s
+triCo_intersect <- huc8_sf_utm %>% 
+  st_filter(triCo, .predicate = st_intersects)
 
-
+myMap2 + mapview(triCo_intersect, alpha.regions = 0, color='red')
 
 #Intersect the HUC_8s
+triCo_HUC8_sf <- triCo %>% st_intersection(huc8_sf_utm)
 
-
+myMap2 + mapview(triCo_HUC8_sf, alpha.regions = 0, color='red')
 ```
 
 ## 3.4 Geometry manipulations
