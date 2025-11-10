@@ -1,8 +1,10 @@
 ---
-title: "Assignment 9: Spatial Analysis in R"
+title: 'Assignment 9: Spatial Analysis in R'
 author: "Evan Lim"
-output: html_document
-editor_options: 
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
   chunk_output_type: console
 ---
 
@@ -91,7 +93,7 @@ str(gage_data_raw)
 
 9.    What columns in the dataset contain the x and y coordinate values, respectively?  
 > ANSWER:
-> 
+> dec_long_va and dec_lat_va contain the x and y coordinate values respectively.
 
 
 ### Convert the dataframe to a spatial features ("sf") dataframe
@@ -103,12 +105,14 @@ str(gage_data_raw)
 
 ```{r Convert dataframe to sf dataframe}
 #10. Convert to an sf object
-
-
+gage_data_sf <- gage_data_raw %>% 
+  st_as_sf(
+    coords = c('dec_long_va', 'dec_lat_va'),
+    crs=4269
+  )
 
 #11. Display the structure
-
-
+str(gage_data_sf)
 
 
 ```
@@ -116,7 +120,9 @@ str(gage_data_raw)
 12.   What new field(s) appear in the sf dataframe created? What field(s), if any, disappeared?
 
 >ANSWER: 
->
+> The geometry column appears in the sf dataframe, while the longitutde and
+latitude columns disappeared. The geometry column now contains both the 
+longitude and latitude values within it.
 
 
 ### Plot the gage locations on top of the counties
@@ -128,7 +134,13 @@ str(gage_data_raw)
 
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
-
+ggplot() +
+  geom_sf(data=nb_counties_sf, fill = 'grey') +
+  geom_sf(data=gage_data_sf, color = 'blue', alpha = 0.5) +
+   labs(
+    title = "NWIS Gage Locations in Nebraska",
+    subtitle = "Evan Lim"
+  )
 
 ```
 
@@ -148,23 +160,28 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r Read in gage site data}
 #14. Read the site flow data into a data frame
-
+site_flow_data <- read.csv(here('./Data/Raw/NWIS_SiteFlowData_NE_RAW.csv'),
+                           colClasses = c('site_no' = 'factor'))
 
 
 #15. Show the structure of the dataframe 
-
+str(site_flow_data)
 
 
 #16. Join the flow data to our NWIS gage location spatial dataframe
-
-
+site_flow_gage_data <- gage_data_sf %>% 
+  left_join(
+    site_flow_data,
+    by = c("station_nm")) %>%
+  select(-site_no.y) %>% 
+  na.omit()
 
 #17. Show the column names in the resulting spatial dataframe
-
+colnames(site_flow_gage_data)
 
 
 #18. Show the dimensions of this joined dataset
-
+dim(site_flow_gage_data)
 
 
 ```
@@ -177,7 +194,9 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 
 ```{r map gage sites}
 #Map the points, sized by gage height
-
+ggplot() +
+  geom_sf(data = nb_counties_sf) +
+  geom_sf(data = site_flow_gage_data, aes(size = gage_ht), color = 'blue', alpha = 0.5,) 
 
 ```
 
@@ -195,11 +214,14 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 
 ```{r spatial analysis}
 #20 Transform the counties and gage location datasets to UTM Zone 14
-
+nb_counties_sf_utm <- st_transform(nb_counties_sf, crs = 32614)
+gage_data_sf_utm <- st_transform(gage_data_sf, crs = 32614)
 
 
 #21 Plot the data
-
+ggplot() +
+  geom_sf(data = nb_counties_sf_utm, color = 'grey')+
+  geom_sf(data = gage_data_sf_utm, color = 'blue', alpha = 0.5)
 
 
 ```
@@ -220,15 +242,37 @@ Now let's zoom into a particular county and examine the gages located there.
 
 ```{r spatial selection}
 #22 Select Washington county to a new spatial dataframe
-
+washington_county_sf <- nb_counties_sf_utm %>% 
+  filter(NAME == 'Washington')
 
 #23 Spatially select gages within the selected county to a new spatial dataframe
+washington_county_gages <- gage_data_sf_utm %>% 
+  st_filter(washington_county_sf, .predicate = st_intersects)
 
 
 #24 Spatially select gages within 20k of the selected county to a new spatial dataframe
 
+#Creating a buffer of 20km
+washington_buffer <- washington_county_sf %>% 
+  st_buffer(.,dist = 20000)
+
+#Selecting gages that intersect with the buffer
+washington_gages_20km <- gage_data_sf_utm %>% 
+  st_filter(washington_buffer, .predicate = st_intersects)
+
 
 #25 Plot
+
+#Plotting the statecounties as first layer, followed by Washington county with
+#distinct color, followed by relevant gages, followed by additional layer of
+#inner gages which are last to allow for different color
+
+ggplot() +
+  geom_sf(data = nb_counties_sf_utm, fill = 'grey') +
+  geom_sf(data = washington_county_sf, color = 'black', fill = 'white') +
+  geom_sf(data = washington_gages_20km, color = 'blue', alpha = 0.5) +
+  geom_sf(data = washington_county_gages, color = 'red', alpha = 0.5)
+
 
 
 ```
