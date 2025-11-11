@@ -92,8 +92,8 @@ str(gage_data_raw)
 ```
 
 9.    What columns in the dataset contain the x and y coordinate values, respectively?  
-> ANSWER:
-> dec_long_va and dec_lat_va contain the x and y coordinate values respectively.
+> ANSWER: dec_long_va and dec_lat_va contain the x and y coordinate values 
+respectively.
 
 
 ### Convert the dataframe to a spatial features ("sf") dataframe
@@ -172,8 +172,7 @@ str(site_flow_data)
 site_flow_gage_data <- gage_data_sf %>% 
   left_join(
     site_flow_data,
-    by = c("station_nm")) %>%
-  select(-site_no.y) %>% 
+    by = c("station_nm", "site_no")) %>%
   na.omit()
 
 #17. Show the column names in the resulting spatial dataframe
